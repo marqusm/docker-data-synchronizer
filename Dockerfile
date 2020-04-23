@@ -9,6 +9,7 @@ RUN \
   mkdir /log
 
 COPY app/ /app
+COPY main.py /
 
 
-ENTRYPOINT ["python3", "/app/script.py"]
+ENTRYPOINT ["python3", "/main.py"]
