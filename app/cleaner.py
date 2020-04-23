@@ -1,12 +1,13 @@
 import logging
 import requests
-import common
-import configuration as cfg
+from app import common
+from app import configuration as cfg
 import sys
 
 
 def cleanup_data():
     logging.info("Cleanup data starting...")
+    common.cleanup_processed_list()
     headers = common.get_transmission_headers()
     response = requests.post(cfg.TRANSMISSION_API, headers=headers,
                              json={"method": "torrent-get",
@@ -25,16 +26,17 @@ def cleanup_data():
         is_processed = item["name"] in processed_items
         is_finished = item["status"] >= 5
         upload_ratio = item["uploadRatio"]
-        days_seeding = item["secondsSeeding"] / (60. * 60 * 24)
+        days_seeding = item["secondsSeeding"] / 86400.
         logging.debug(
             "Transmission item: Is Finished={}, Upload Ratio={:3.2f}, Days Seeding={:.2f}, Name={}".format(is_finished, upload_ratio,
                                                                                                            days_seeding, item["name"]))
 
-        if is_processed and is_finished and free_disk_space < 10:
-            logging.info("Item is processed and free disk space is under 10GB. Deleting item: {}".format(item["name"]))
+        if is_processed and is_finished and free_disk_space < cfg.MIN_FREE_DISK_GB:
+            logging.info(
+                "Item is processed and free disk space is under {}GB. Deleting item: {}".format(cfg.MIN_FREE_DISK_GB, item["name"]))
             delete_transmission_item(item)
             is_any_item_removed = True
-        elif is_processed and is_finished and (upload_ratio >= 2 or days_seeding > 10):
+        elif is_processed and is_finished and (upload_ratio >= cfg.MAX_UPLOAD_RATIO or days_seeding > cfg.MAX_DAYS_SEEDING):
             logging.info("Item is processed, old enough and seeded enough. Deleting item: {}".format(item["name"]))
             delete_transmission_item(item)
             is_any_item_removed = True

@@ -1,8 +1,8 @@
 import logging
 import os
 import subprocess
-import common
-import configuration as cfg
+from app import common
+from app import configuration as cfg
 
 
 def synchronize():
@@ -12,7 +12,7 @@ def synchronize():
     if len(to_process_list) == 0:
         logging.info("There is nothing to sync")
     else:
-        execute_data_sync(to_process_list, processed_list)
+        execute_data_sync(to_process_list)
     logging.info("Sync completed")
 
 
@@ -21,26 +21,25 @@ def calculate_to_process_list(path, processed_items):
     return [item for item in folder_list if item not in processed_items]
 
 
-def execute_data_sync(to_process_items, processed_items):
+def execute_data_sync(to_process_items):
     ps_command = "ps -a | grep rsync"
-    grep_command = "rsync -Pha -e ssh {}/{} {}"
+    rsync_command = "rsync -Pha -e ssh {}/{} {}"
     output = subprocess.check_output(ps_command, shell=True)
     logging.debug("Ps output: " + output.decode("utf-8") + str(output.decode("utf-8").count('\n')))
     if output.decode("utf-8").count("\n") > 2:
         logging.debug("Rsync command already in progress. Skipping the sync")
     else:
         for item in to_process_items:
-            logging.debug("Rsync starting: " + grep_command.format(cfg.SOURCE_PATH, item, cfg.DESTINATION_PATH))
-        #     p = subprocess.Popen(grep_command.format(SOURCE_PATH, item), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            logging.debug("Rsync starting: " + rsync_command.format(cfg.SOURCE_PATH, item, cfg.DESTINATION_PATH))
+        #     p = subprocess.Popen(rsync_command.format(SOURCE_PATH, item), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         #                          shell=True)
         #     for line in iter(p.stdout.readline, b''):
         #         logging.info(line.decode("utf-8"))
         #     p.stdout.close()
         #     p.wait()
-            data_file = open(cfg.DATA_PATH, 'a+')
-            data_file.write(item + "\n")
-            data_file.close()
-            processed_items.append(item)
+            path = os.path.join(cfg.SOURCE_PATH, item)
+            size = os.path.getsize(path) / 1024 ** 3
+            common.add_processed_item(item, size)
             logging.debug("Rsync finished for item: {}".format(item))
     logging.debug("Rsync command completed")
 

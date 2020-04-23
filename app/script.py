@@ -1,11 +1,12 @@
 import time
-import synchronizer
-import cleaner
-import common
-import configuration as cfg
+import app.synchronizer as synchronizer
+import app.cleaner as cleaner
+import app.common as common
+import app.configuration as cfg
 
 if __name__ == '__main__':
-    common.create_data_file_if_not_exists()
+    cfg.init()
+    common.create_database_if_not_exists()
     while True:
         cleaner.cleanup_data()
         synchronizer.synchronize()
