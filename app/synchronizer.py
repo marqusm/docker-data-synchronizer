@@ -6,14 +6,14 @@ import configuration as cfg
 
 
 def synchronize():
-    logging.debug("Sync starting...")
+    logging.info("Sync starting...")
     processed_list = common.get_processed_list()
     to_process_list = calculate_to_process_list(cfg.SOURCE_PATH, processed_list)
     if len(to_process_list) == 0:
-        logging.debug("There is nothing to sync")
+        logging.info("There is nothing to sync")
     else:
         execute_data_sync(to_process_list, processed_list)
-    logging.debug("Sync completed")
+    logging.info("Sync completed")
 
 
 def calculate_to_process_list(path, processed_items):
@@ -27,7 +27,7 @@ def execute_data_sync(to_process_items, processed_items):
     output = subprocess.check_output(ps_command, shell=True)
     logging.debug("Ps output: " + output.decode("utf-8") + str(output.decode("utf-8").count('\n')))
     if output.decode("utf-8").count("\n") > 2:
-        logging.debug("Rsync already in progress. Stopping the script")
+        logging.debug("Rsync command already in progress. Skipping the sync")
     else:
         for item in to_process_items:
             logging.debug("Rsync starting: " + grep_command.format(cfg.SOURCE_PATH, item, cfg.DESTINATION_PATH))
@@ -41,8 +41,8 @@ def execute_data_sync(to_process_items, processed_items):
             data_file.write(item + "\n")
             data_file.close()
             processed_items.append(item)
-            logging.debug("Rsync finished: " + item)
-    logging.info("Rsync phase completed")
+            logging.debug("Rsync finished for item: {}".format(item))
+    logging.debug("Rsync command completed")
 
 
 if __name__ == '__main__':
