@@ -38,7 +38,7 @@ def execute_data_sync(to_process_items):
         #     p.stdout.close()
         #     p.wait()
             path = os.path.join(cfg.SOURCE_PATH, item)
-            size = os.path.getsize(path) / 1024 ** 3
+            size = common.get_size(path)
             common.add_processed_item(item, size)
             logging.debug("Rsync finished for item: {}".format(item))
     logging.debug("Rsync command completed")

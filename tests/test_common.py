@@ -55,6 +55,10 @@ class TestCleaner(unittest.TestCase):
         items = common.get_processed_list()
         self.assertEqual(["Test 1", "Test 3"], items)
 
+    def test_get_size(self):
+        size = common.get_size("../tests")
+        self.assertEqual(0., size)
+
 
 if __name__ == '__main__':
     unittest.main()

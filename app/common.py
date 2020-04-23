@@ -2,6 +2,7 @@ import os
 import requests
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 from app import configuration as cfg
 from app import sql_statements as sql
 
@@ -47,3 +48,9 @@ def cleanup_processed_list():
     c.execute("DELETE FROM items WHERE creation_date < DATETIME('now', '-{} day')".format(cfg.MAX_DAYS_DB_ENTRY))
     conn.commit()
     conn.close()
+
+
+def get_size(path):
+    size_in_b = sum([f.stat().st_size for f in Path(path).glob("**/*")])
+    size_in_gb = size_in_b / 1024 ** 3
+    return round(size_in_gb, 3)

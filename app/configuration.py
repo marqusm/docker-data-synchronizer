@@ -4,7 +4,7 @@ import os
 DESTINATION_PATH = os.getenv("DESTINATION_PATH", "")
 TRANSMISSION_API = os.getenv("TRANSMISSION_API", "")
 
-DATABASE_PATH = "/data/state.db"
+DATABASE_PATH = "/data/data.db"
 SOURCE_PATH = "/sync"
 LOG_FILE_PATH = "/log/data-synchronizer.log"
 LOG_LEVEL = logging.DEBUG
