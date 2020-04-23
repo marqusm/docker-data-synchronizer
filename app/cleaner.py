@@ -34,7 +34,7 @@ def cleanup_data():
             logging.info("Item is processed and free disk space is under 10GB. Deleting item: {}".format(item["name"]))
             delete_transmission_item(item)
             is_any_item_removed = True
-        elif is_processed and is_finished and (upload_ratio >= 1. or days_seeding > 10.):
+        elif is_processed and is_finished and (upload_ratio >= 2. or days_seeding > 10.):
             logging.info("Item is processed, old enough and seeded enough. Deleting item: {}".format(item["name"]))
             delete_transmission_item(item)
             is_any_item_removed = True
