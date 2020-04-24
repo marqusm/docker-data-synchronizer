@@ -22,8 +22,9 @@ class TestCleaner(unittest.TestCase):
         conn = sqlite3.connect(cfg.DATABASE_PATH)
         c = conn.cursor()
         c.execute("DELETE FROM items")
-        c.execute("INSERT INTO items (name, size, creation_date) VALUES ('Test 1', 1., '2020-04-15 14:15:16')")
-        c.execute("INSERT INTO items (name, size, creation_date) VALUES ('Test 2', 1., '2020-04-17 15:16:17')")
+        c.execute("INSERT INTO items (name, size, creation_date) VALUES ('Test 1', 1., '{}')".format(datetime.now() - timedelta(days=1)))
+        c.execute("INSERT INTO items (name, size, creation_date) VALUES ('Test 2', 1., '{}')".format(datetime.now() - timedelta(days=5)))
+        c.execute("INSERT INTO items (name, size, creation_date) VALUES ('Test 2', 1., '{}')".format(datetime.now() - timedelta(days=10)))
         conn.commit()
         conn.close()
         items = common.get_processed_list()
@@ -52,7 +53,7 @@ class TestCleaner(unittest.TestCase):
         conn.commit()
         conn.close()
         common.cleanup_processed_list()
-        items = common.get_processed_list()
+        items = common.get_processed_list(days_delta=500)
         self.assertEqual(["Test 1", "Test 3"], items)
 
     def test_get_size(self):

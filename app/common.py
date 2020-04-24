@@ -1,7 +1,7 @@
 import os
 import requests
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from app import configuration as cfg
 from app import sql_statements as sql
@@ -31,10 +31,10 @@ def add_processed_item(name, size):
     conn.close()
 
 
-def get_processed_list():
+def get_processed_list(days_delta=cfg.CONSIDERING_HISTORY_DAYS):
     conn = sqlite3.connect(cfg.DATABASE_PATH)
     c = conn.cursor()
-    c.execute("SELECT name FROM items")
+    c.execute("SELECT name FROM items WHERE creation_date > '{}'".format(datetime.now() - timedelta(days=days_delta)))
     rows = c.fetchall()
     conn.close()
     return [row[0] for row in rows]
